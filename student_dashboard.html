@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Student Dashboard{% endblock %}
+
+{% block content %}
+<h3 class="text-primary">Student Portal - Welcome, {{ student.name }}</h3>
+<p class="text-muted">Roll No: {{ student.roll_no }} | Department: {{ student.department }}</p>
+
+<h4 class="mt-4 text-secondary">Available Examinations to Book</h4>
+<table class="table table-bordered bg-white shadow-sm mt-3">
+    <thead class="table-header-custom">
+        <tr>
+            <th>Exam Title</th>
+            <th>Date</th>
+            <th>Duration</th>
+            <th>Seats Available</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ex in available_exams %}
+        <tr>
+            <td><strong>{{ ex.exam_title }}</strong></td>
+            <td>{{ ex.exam_date.strftime('%Y-%m-%d') }}</td>
+            <td>{{ ex.duration }}</td>
+            <td>{{ ex.available_seats }} seats left</td>
+            <td>
+                <a href="{{ url_for('book_exam', id=ex.id) }}" class="btn btn-sm btn-success">Book Slot</a>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-center text-muted">No open exams available for booking at the moment.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h4 class="mt-5 text-secondary">My Exam Bookings & Results</h4>
+<table class="table table-bordered bg-white shadow-sm mt-3">
+    <thead class="table-header-custom">
+        <tr>
+            <th>Booking ID</th>
+            <th>Exam Title</th>
+            <th>Status</th>
+            <th>Marks Obtained</th>
+            <th>Remarks</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for b in my_bookings %}
+        <tr>
+            <td>#{{ b.id }}</td>
+            <td><strong>{{ b.exam.exam_title }}</strong></td>
+            <td><span class="badge bg-secondary">{{ b.status }}</span></td>
+            <td>{{ b.marks_obtained if b.marks_obtained is not none else 'Pending Evaluation' }}</td>
+            <td>{{ b.remarks if b.remarks else '-' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-center text-muted">You have not booked any examination slots yet.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

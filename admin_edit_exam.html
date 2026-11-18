@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Edit Examination - Admin{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm p-4 bg-white border-0">
+            <h4 class="text-primary mb-3">Edit Examination & Timeline</h4>
+            <form method="POST" action="{{ url_for('admin_edit_exam', id=exam.id) }}">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Exam Title</label>
+                    <input type="text" name="exam_title" class="form-control" value="{{ exam.exam_title }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Course</label>
+                    <select name="course_id" class="form-select" required>
+                        {% for c in courses %}
+                        <option value="{{ c.id }}" {% if c.id == exam.course_id %}selected{% endif %}>{{ c.course_code }} - {{ c.course_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Assigned Examiner (Exceptional Reassignment)</label>
+                    <select name="assigned_examiner_id" class="form-select" required>
+                        {% for ex in examiners %}
+                        <option value="{{ ex.id }}" {% if ex.id == exam.assigned_examiner_id %}selected{% endif %}>{{ ex.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Exam Date</label>
+                    <input type="date" name="exam_date" class="form-control" value="{{ exam.exam_date.strftime('%Y-%m-%d') }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Duration</label>
+                    <input type="text" name="duration" class="form-control" value="{{ exam.duration }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Total Seats</label>
+                    <input type="number" name="total_seats" class="form-control" value="{{ exam.total_seats }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="Open" {% if exam.status == 'Open' %}selected{% endif %}>Open</option>
+                        <option value="Closed" {% if exam.status == 'Closed' %}selected{% endif %}>Closed</option>
+                        <option value="Completed" {% if exam.status == 'Completed' %}selected{% endif %}>Completed</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary-custom w-100">Save Changes</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold text-primary">Admin  Dashboard</h3>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('admin_add_course') }}" class="btn btn-primary-custom shadow-sm">+ Add Course</a>
+        <a href="{{ url_for('admin_add_exam') }}" class="btn btn-success shadow-sm">+ Schedule Exam</a>
+    </div>
+</div>
+
+<div class="row mb-4 text-center fw-bold g-3">
+    <div class="col"><div class="card p-3 card-stat-1 shadow-sm">Courses : {{ total_courses }}</div></div>
+    <div class="col"><div class="card p-3 card-stat-2 shadow-sm">Exams : {{ total_exams }}</div></div>
+    <div class="col"><div class="card p-3 card-stat-3 shadow-sm">Examiners : {{ total_examiners }}</div></div>
+    <div class="col"><div class="card p-3 card-stat-4 shadow-sm">Students : {{ total_students }}</div></div>
+    <div class="col"><div class="card p-3 bg-light shadow-sm">Bookings : {{ total_bookings }}</div></div>
+</div>
+
+<div class="card p-3 mb-4 shadow-sm border-0 bg-white">
+    <h5 class="mb-3 text-primary fw-semibold"> Search for Students , Examiners , Examinations , Bookings</h5>
+    <form class="d-flex" method="GET" action="{{ url_for('admin_dashboard') }}">
+        <input name="search_query" value="{{ request.args.get('search_query', '') }}" class="form-control me-2" type="search" placeholder="Type name, email, roll no, or ID...">
+        <button class="btn btn-outline-primary" type="submit">Search</button>
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary ms-2">Reset</a>
+    </form>
+</div>
+
+<h5 class="text-secondary fw-bold mt-4">Courses Management</h5>
+<div class="card shadow-sm border-0 mb-4 overflow-hidden">
+    <table class="table table-hover align-middle mb-0 bg-white">
+        <thead class="table-header-custom">
+            <tr><th>Code</th><th>Course Name</th><th>Department</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+            {% for c in courses %}
+            <tr>
+                <td>{{ c.course_code }}</td>
+                <td class="fw-semibold">{{ c.course_name }}</td>
+                <td>{{ c.department }}</td>
+                <td>
+                    <a href="{{ url_for('admin_edit_course', id=c.id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                    <a href="{{ url_for('admin_delete_course', id=c.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Remove course?')">Remove</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="text-muted text-center py-3">No courses found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<h5 class="text-secondary fw-bold">Examinations , Timelines & Slot Controls</h5>
+<div class="card shadow-sm border-0 mb-4 overflow-hidden">
+    <table class="table table-hover align-middle mb-0 bg-white">
+        <thead class="table-header-custom">
+            <tr><th>Title</th><th>Timeline (Date & Duration)</th><th>Seats & Slots</th><th>Booking Status</th><th>Actions & Rubrics</th></tr>
+        </thead>
+        <tbody>
+            {% for e in exams %}
+            <tr>
+                <td class="fw-semibold">{{ e.exam_title }}</td>
+                <td>{{ e.exam_date.strftime('%Y-%m-%d') }} <br><small class="text-muted">{{ e.duration }}</small></td>
+                <td>{{ e.available_seats }} / {{ e.total_seats }} seats</td>
+                <td>
+                    <span class="badge {% if e.status == 'Open' %}bg-success{% else %}bg-secondary{% endif %}">{{ e.status }}</span>
+                    <div class="btn-group btn-group-sm mt-1 d-block">
+                        <a href="{{ url_for('admin_toggle_exam_status', id=e.id, status='Open') }}" class="btn btn-outline-success py-0">Open Slots</a>
+                        <a href="{{ url_for('admin_toggle_exam_status', id=e.id, status='Closed') }}" class="btn btn-outline-secondary py-0">Close Slots</a>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex flex-wrap gap-1">
+                        <a href="{{ url_for('admin_manage_rubrics', exam_id=e.id) }}" class="btn btn-sm btn-info text-white">Manage Rubrics</a>
+                        <a href="{{ url_for('admin_edit_exam', id=e.id) }}" class="btn btn-sm btn-outline-primary">Edit / Reassign</a>
+                        <a href="{{ url_for('admin_delete_exam', id=e.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete exam?')">Remove</a>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" class="text-muted text-center py-3">No exams found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<h5 class="text-secondary fw-bold">Examiners Management (Add , Approve , Deactivate)</h5>
+<div class="card shadow-sm border-0 mb-4 overflow-hidden">
+    <table class="table table-hover align-middle mb-0 bg-white">
+        <thead class="table-header-custom">
+            <tr><th>ID</th><th>Name</th><th>Department</th><th>Approval State</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+            {% for ex in examiners %}
+            <tr>
+                <td>#{{ ex.id }}</td>
+                <td class="fw-semibold">{{ ex.name }}</td>
+                <td>{{ ex.department }}</td>
+                <td>{% if ex.is_approved %}<span class="badge bg-success">Approved / Active</span>{% else %}<span class="badge bg-warning text-dark">Pending / Deactivated</span>{% endif %}</td>
+                <td>
+                    {% if not ex.is_approved %}
+                        <a href="{{ url_for('admin_action', target='examiner', id=ex.id, act='approve') }}" class="btn btn-success btn-sm">Approve Examiner</a>
+                    {% else %}
+                        <a href="{{ url_for('admin_action', target='examiner', id=ex.id, act='blacklist') }}" class="btn btn-danger btn-sm">Deactivate Examiner</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" class="text-muted text-center py-3">No examiners found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<h5 class="text-secondary fw-bold">Registered Students</h5>
+<div class="card shadow-sm border-0 mb-4 overflow-hidden">
+    <table class="table table-hover align-middle mb-0 bg-white">
+        <thead class="table-header-custom">
+            <tr><th>Roll No</th><th>Name</th><th>Department</th><th>Contact</th></tr>
+        </thead>
+        <tbody>
+            {% for st in students %}
+            <tr>
+                <td class="fw-semibold">{{ st.roll_no }}</td>
+                <td>{{ st.name }}</td>
+                <td>{{ st.department }}</td>
+                <td>{{ st.contact_details }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="text-muted text-center py-3">No students found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<h5 class="text-secondary fw-bold">Examination Bookings & Rescheduling</h5>
+<div class="card shadow-sm border-0 overflow-hidden">
+    <table class="table table-hover align-middle mb-0 bg-white">
+        <thead class="table-header-custom">
+            <tr><th>Booking ID</th><th>Student ID</th><th>Exam Title</th><th>Status</th><th>Marks</th><th>Reschedule Action</th></tr>
+        </thead>
+        <tbody>
+            {% for b in bookings %}
+            <tr>
+                <td>#{{ b.id }}</td>
+                <td>{{ b.user_id }}</td>
+                <td class="fw-semibold">{{ b.exam.exam_title }}</td>
+                <td><span class="badge bg-info text-dark">{{ b.status }}</span></td>
+                <td>{{ b.marks_obtained if b.marks_obtained is not none else 'N/A' }}</td>
+                <td>
+                    <a href="{{ url_for('admin_reschedule_booking', id=b.id) }}" class="btn btn-sm btn-warning text-white">Reschedule Booking</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" class="text-muted text-center py-3">No booking records found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

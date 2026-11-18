@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Login - Examination Portal{% endblock %}
+
+{% block content %}
+<style>
+    .login-box {
+        max-width: 400px;
+        margin: 60px auto;
+        padding: 30px;
+        background: #ffffff;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    .form-label-custom { font-weight: 600; color: #444; }
+</style>
+
+<div class="login-box">
+    <h3 class="text-center mb-4 text-primary">Portal Login</h3>
+
+    <form method="POST" action="{{ url_for('login') }}">
+        <div class="mb-3">
+            <label class="form-label-custom">Email ID</label>
+            <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label-custom">Password</label>
+            <input type="password" name="password" class="form-control" placeholder="Enter password" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary-custom w-100 py-2">Sign In</button>
+    </form>
+
+    <div class="mt-3 text-center">
+        <span class="small text-muted">Don't have an account?</span>
+        <a href="{{ url_for('register') }}" class="text-decoration-none fw-semibold">Register here</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Examiner Dashboard{% endblock %}
+
+{% block content %}
+<h3 class="text-primary">Examiner Portal - Welcome, {{ examiner.name }}</h3>
+<p class="text-muted">Department: {{ examiner.department }} | Examiner Code: {{ examiner.examiner_code }}</p>
+
+<h4 class="mt-4 text-secondary">Assigned Examinations</h4>
+<table class="table table-bordered bg-white shadow-sm mt-3">
+    <thead class="table-header-custom">
+        <tr>
+            <th>Exam ID</th>
+            <th>Exam Title</th>
+            <th>Date</th>
+            <th>Seats Available</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ex in assigned_exams %}
+        <tr>
+            <td>#{{ ex.id }}</td>
+            <td><strong>{{ ex.exam_title }}</strong></td>
+            <td>{{ ex.exam_date.strftime('%Y-%m-%d') }}</td>
+            <td>{{ ex.available_seats }} left</td>
+            <td><span class="badge bg-primary">{{ ex.status }}</span></td>
+            <td>
+                <a href="{{ url_for('examiner_manage_exam', id=ex.id) }}" class="btn btn-sm btn-primary-custom">Manage Rubrics & Grading</a>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-muted">No exams assigned to you yet.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

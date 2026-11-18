@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Manage Rubrics - Admin{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-sm btn-outline-secondary">&larr; Back to Dashboard</a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card p-4 shadow-sm border-0 bg-white">
+            <h4 class="text-primary fw-bold mb-3">Manage Rubrics for: {{ exam.exam_title }}</h4>
+            
+            <form method="POST" action="{{ url_for('admin_manage_rubrics', exam_id=exam.id) }}">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Criteria Name</label>
+                    <input type="text" name="criteria_name" class="form-control" placeholder="e.g. Algorithmic Efficiency" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Maximum Marks</label>
+                    <input type="number" name="max_marks" class="form-control" placeholder="e.g. 25" required>
+                </div>
+                <button type="submit" class="btn btn-primary-custom w-100 py-2 fw-semibold">Add Rubric Criterion</button>
+            </form>
+
+            <hr class="my-4">
+            <h5 class="fw-bold text-secondary">Existing Rubric Criteria</h5>
+            <table class="table table-bordered mt-2">
+                <thead class="table-light">
+                    <tr><th>Criteria</th><th>Max Marks</th><th>Action</th></tr>
+                </thead>
+                <tbody>
+                    {% for r in rubrics %}
+                    <tr>
+                        <td>{{ r.criteria_name }}</td>
+                        <td>{{ r.max_marks }}</td>
+                        <td>
+                            <a href="{{ url_for('admin_delete_rubric', id=r.id) }}" class="btn btn-sm btn-outline-danger">Remove</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="3" class="text-muted text-center">No rubrics defined yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

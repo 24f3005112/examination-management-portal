@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Schedule Exam - Admin{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm p-4">
+            <h4 class="text-primary mb-3">Schedule New Examination</h4>
+            <form method="POST" action="{{ url_for('admin_add_exam') }}">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Exam Title</label>
+                    <input type="text" name="exam_title" class="form-control" placeholder="e.g. Midterm Practical Exam" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Select Course</label>
+                    <select name="course_id" class="form-select" required>
+                        {% for c in courses %}
+                        <option value="{{ c.id }}">{{ c.course_code }} - {{ c.course_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Assign Examiner</label>
+                    <select name="assigned_examiner_id" class="form-select" required>
+                        {% for ex in examiners %}
+                        <option value="{{ ex.id }}">{{ ex.name }} (Dept: {{ ex.department }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Exam Date</label>
+                    <input type="date" name="exam_date" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Duration</label>
+                    <input type="text" name="duration" class="form-control" placeholder="e.g. 2 Hours" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Total Seats Capacity</label>
+                    <input type="number" name="total_seats" class="form-control" placeholder="e.g. 60" required>
+                </div>
+                <button type="submit" class="btn btn-primary-custom w-100">Schedule Examination</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
